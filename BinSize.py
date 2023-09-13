@@ -17,8 +17,8 @@ lastProblemID = 0
 
 def createNewProblem():
     global lastProblemID
+    lastProblemID += 1
     problemID = lastProblemID
-    problemID += 1
     binEncoding = []
     binPackingInstances[problemID] = binEncoding
     return problemID, binEncoding
@@ -43,18 +43,34 @@ def newProblem():
     }
     return json.dumps(response)
 
+@app.route('/placeItem/<problemID>/<size>', methods=['GET'])
+def placeItem(problemID, size):
+    binEncoding = binPackingInstances[problemID]
+    bins = binEncoding.split('#')
+    binPlaced = False
+    for index, bin in enumerate(bins):
+        items = bin.split('!')
+        total_size = 0
+        for item in items:
+            total_size += int(item)
+        if total_size + int(size) <= 100:
+            new_bin_encoding = binEncoding.replace(bin, bin + '!' + size)
+            bin_number = index + 1
+            binPlaced = True
+            break
+    new_item_size = size
+    if not binPlaced:
+        if binEncoding == "":
+            new_bin_encoding = str(new_item_size) + "#"
+        else:
+            new_bin_encoding = binEncoding + "#" + str(new_item_size)
+        bin_number = len(bins) + 1
+    response = {
+        "ID": problemID, 'size': new_item_size, 'loc': bin_number, 'bins': new_bin_encoding
+    }
+    return json.dumps(response)
 
-
-def placeItem():
-# The problemID should be the same as was provided in the input
-
-# new_item_size should be the size of the newly placed item
-
-# bin_number should be the number of the bin where the new item was placed. (Please number the first bin as 1)
-
-# The new_bin_encoding should be a string encoding the set of bins with the new itemed placed.
-
-# Multiple bins with its own ID that could have multiple bins that could be worked
-def endProblem():
+@app.route('/endproblem/<problemID>', methods=['GET'])
+def endProblem(problemID):
 
 
