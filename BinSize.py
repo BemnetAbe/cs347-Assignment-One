@@ -13,6 +13,7 @@ import json
 app = flask.Flask(__name__)
 
 binPackingInstances = {}
+binPackingInstancesCompleted = {}
 lastProblemID = 0
 
 def createNewProblem():
@@ -21,6 +22,7 @@ def createNewProblem():
     problemID = lastProblemID
     binEncoding = []
     binPackingInstances[problemID] = binEncoding
+    binPackingInstancesCompleted[problemID] = False
     return problemID, binEncoding
 
 
@@ -48,6 +50,8 @@ def newProblem():
 
 @app.route('/placeItem/<problemID>/<size>', methods=['GET'])
 def placeItem(problemID, size):
+    if binPackingInstancesCompleted[problemID] == False:
+        return json.dumps({'error': 'Problem ID has already been completed'})
     binEncoding = binPackingInstances[problemID]
     bins = binEncoding.split('#')
     binPlaced = False
@@ -79,7 +83,7 @@ def endProblem(problemID):
     bins = binEncoding.split('#')
     total_size, num_items, wasted_space = 0
     num_bins = len(bins)
-    
+    binPackingInstancesCompleted[problemID] = True
     for bin in bins:
         items = bin.split('!')
         for item in items:
@@ -90,7 +94,4 @@ def endProblem(problemID):
         'ID': problemID, 'size': total_size, 'items': num_items, 'count': num_bins, 'wasted' : wasted_space, 'bins' : binEncoding
     }
     return json.dumps(response)
-
-
-
 
