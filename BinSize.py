@@ -87,9 +87,9 @@ def endProblem(problemID):
     for bin in bins:
         items = bin.split('!')
         for item in items:
-            total_size += int(item)
-            num_items += 1
-    
+            if item:
+                total_size += int(item)
+                num_items += 1
     response = {
         'ID': problemID, 'size': total_size, 'items': num_items, 'count': num_bins, 'wasted' : wasted_space, 'bins' : binEncoding
     }
