@@ -20,7 +20,7 @@ def createNewProblem():
     global lastProblemID
     lastProblemID += 1
     problemID = lastProblemID
-    binEncoding = []
+    binEncoding = ""
     binPackingInstances[problemID] = binEncoding
     binPackingInstancesCompleted[problemID] = False
     return problemID, binEncoding
@@ -50,35 +50,35 @@ def newProblem():
 
 @app.route('/placeItem/<problemID>/<size>', methods=['GET'])
 def placeItem(problemID, size):
+    problemID = int(problemID)
+    binPlaced = False
     if binPackingInstancesCompleted[problemID] == True:
         return json.dumps({'error': 'Problem ID has already been completed'})
     binEncoding = binPackingInstances[problemID]
     bins = binEncoding.split('#')
-    binPlaced = False
     for index, bin in enumerate(bins):
         items = bin.split('!')
-        total_size = 0
-        for item in items:
-            total_size += int(item)
-            if total_size + int(size) <= 100:
-                new_bin_encoding = binEncoding.replace(bin, bin + '!' + size)
-                bin_number = index + 1
-                binPlaced = True
-                break
-    new_item_size = size
+        total_size = sum(int(item) for item in items if item)  
+        if total_size + int(size) <= 100:
+            items.append(size)
+            bins[index] = '!'.join(items)
+            new_bin_encoding = '#'.join(bins)
+            bin_number = index + 1
+            binPlaced = True
+            break
     if not binPlaced:
-        if binEncoding == "":
-            new_bin_encoding = str(new_item_size) + "#"
-        else:
-            new_bin_encoding = binEncoding + "#" + str(new_item_size)
+        new_bin_encoding = binEncoding + "#" + str(size)
         bin_number = len(bins) + 1
+    binPackingInstances[problemID] = new_bin_encoding
     response = {
-        "ID": problemID, 'size': new_item_size, 'loc': bin_number, 'bins': new_bin_encoding
+        "ID": problemID, 'size': size, 'loc': bin_number, 'bins': new_bin_encoding
     }
     return json.dumps(response)
 
+
 @app.route('/endproblem/<problemID>', methods=['GET'])
 def endProblem(problemID):
+    problemID = int(problemID)
     binEncoding = binPackingInstances[problemID]
     bins = binEncoding.split('#')
     total_size = num_items = wasted_space = 0
