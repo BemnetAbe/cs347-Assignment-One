@@ -1,4 +1,5 @@
 '''
+This is a simple API that allows you to create a new bin packing problem, place items into the bins, and end the problem.
 Each bin has a size of 100 units
 Different sizes of items within the same bin are seperated by "!" but each bin 
 is seperated by "#" 
