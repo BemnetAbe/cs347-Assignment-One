@@ -50,7 +50,7 @@ def newProblem():
 
 @app.route('/placeItem/<problemID>/<size>', methods=['GET'])
 def placeItem(problemID, size):
-    if binPackingInstancesCompleted[problemID] == False:
+    if binPackingInstancesCompleted[problemID] == True:
         return json.dumps({'error': 'Problem ID has already been completed'})
     binEncoding = binPackingInstances[problemID]
     bins = binEncoding.split('#')
@@ -81,7 +81,7 @@ def placeItem(problemID, size):
 def endProblem(problemID):
     binEncoding = binPackingInstances[problemID]
     bins = binEncoding.split('#')
-    total_size, num_items, wasted_space = 0
+    total_size = num_items = wasted_space = 0
     num_bins = len(bins)
     binPackingInstancesCompleted[problemID] = True
     for bin in bins:
@@ -95,3 +95,10 @@ def endProblem(problemID):
     }
     return json.dumps(response)
 
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Run the bin packing API')
+    parser.add_argument('--port', dest='port', type=int, default=5555, help='The port to run the API on')
+    parser.add_argument('--host', dest='host', type=str, default='localhost', help='The host to run the API on')
+    arguments = parser.parse_args()
+    app.run(host=arguments.host, port=arguments.port)
