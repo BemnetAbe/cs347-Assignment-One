@@ -23,6 +23,9 @@ def createNewProblem():
     binPackingInstances[problemID] = binEncoding
     return problemID, binEncoding
 
+
+
+
 @app.route('/')
 def main():
     return 'Hello and Welcome to Bin Packing.'
@@ -53,11 +56,11 @@ def placeItem(problemID, size):
         total_size = 0
         for item in items:
             total_size += int(item)
-        if total_size + int(size) <= 100:
-            new_bin_encoding = binEncoding.replace(bin, bin + '!' + size)
-            bin_number = index + 1
-            binPlaced = True
-            break
+            if total_size + int(size) <= 100:
+                new_bin_encoding = binEncoding.replace(bin, bin + '!' + size)
+                bin_number = index + 1
+                binPlaced = True
+                break
     new_item_size = size
     if not binPlaced:
         if binEncoding == "":
@@ -72,5 +75,22 @@ def placeItem(problemID, size):
 
 @app.route('/endproblem/<problemID>', methods=['GET'])
 def endProblem(problemID):
+    binEncoding = binPackingInstances[problemID]
+    bins = binEncoding.split('#')
+    total_size, num_items, wasted_space = 0
+    num_bins = len(bins)
+    
+    for bin in bins:
+        items = bin.split('!')
+        for item in items:
+            total_size += int(item)
+            num_items += 1
+    
+    response = {
+        'ID': problemID, 'size': total_size, 'items': num_items, 'count': num_bins, 'wasted' : wasted_space, 'bins' : binEncoding
+    }
+    return json.dumps(response)
+
+
 
 
