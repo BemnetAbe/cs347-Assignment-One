@@ -53,8 +53,8 @@ def newProblem():
 def placeItem(problemID, size):
     problemID = int(problemID)
     binPlaced = False
-    if binPackingInstancesCompleted[problemID] == True:
-        return json.dumps({'error': 'Problem ID has already been completed'})
+    if binPackingInstancesCompleted[problemID] == True or int(size) > 100:
+        return json.dumps({'error': 'Problem ID has already been completed or size of item is too large'})
     binEncoding = binPackingInstances[problemID]
     bins = binEncoding.split('#')
     for index, bin in enumerate(bins):
